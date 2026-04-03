@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="sv" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordförrådets utveckling hos vuxna immigranter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #F9F8F6;
+            color: #2D3339;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Lora', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 380px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #2F6664;
+            border-bottom: 2px solid #2F6664;
+        }
+        .tab-btn.active {
+            background-color: #2F6664;
+            color: white;
+            border-color: #2F6664;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+<!-- Chosen Palette: Warm Neutrals with Muted Teal and Earthy Accents (Background: #F9F8F6, Text: #2D3339, Primary Accent: #2F6664, Secondary Accent: #D4A373, Tertiary Accent: #6D6875) -->
+
+<!-- Application Structure Plan: The SPA is structured as a scrolling interactive dashboard with a sticky navigation bar. It is divided into three logical thematic sections based on the prompt's requirements: 1. Target Vocabulary Sizes (The "Goal"), 2. Impact of Educational Background (The "Starting Point/Condition"), and 3. The Impact of Reading (The "Catalyst"). This non-linear, goal-oriented structure allows users to first understand what is required to pass the educational system, then explore how demographics affect this, and finally see actionable behaviors (reading) that change the outcome. Interactive tabs and visual data comparison are used to keep the user engaged without overwhelming them with text. -->
+
+<!-- Visualization & Content Choices: 
+1. Goal: Show required vocabulary limits -> Viz: Bar Chart (Chart.js) -> Interaction: Hover tooltips for word families explanation -> Justification: Bar charts are best for comparing absolute thresholds.
+2. Goal: Compare background/education impact on active vs passive vocab -> Viz: Grouped Bar Chart (Chart.js) -> Interaction: Tabbed buttons to switch between "Ingen", "Låg", "Hög" background to dynamically update the chart and accompanying text -> Justification: Reduces visual clutter, allows focused comparison of the specific demographic, clearly contrasting active vs passive differences.
+3. Goal: Show the compounding effect of reading -> Viz: Line Chart (Chart.js) -> Interaction: Time-series progression showing divergence over 5 years -> Justification: Line charts effectively communicate trends and cumulative growth over time.
+-->
+
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<nav class="sticky top-0 z-50 bg-[#F9F8F6]/95 backdrop-blur shadow-sm border-b border-stone-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex-shrink-0 flex items-center">
+                <span class="font-bold text-xl tracking-tight text-[#2F6664]">L2 Ordförråd</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#krav" class="nav-link text-sm font-semibold text-stone-600 pb-1 border-b-2 border-transparent">Utbildningskrav</a>
+                <a href="#bakgrund" class="nav-link text-sm font-semibold text-stone-600 pb-1 border-b-2 border-transparent">Skolbakgrund</a>
+                <a href="#lasning" class="nav-link text-sm font-semibold text-stone-600 pb-1 border-b-2 border-transparent">Läsningens effekt</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<header class="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center">
+    <div class="inline-block px-3 py-1 mb-6 rounded-full bg-[#E8F0EF] text-[#2F6664] text-xs font-bold tracking-wider uppercase">Forskningsöversikt</div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-6 text-stone-800 leading-tight">Vuxna andraspråksinlärares ordförråd</h1>
+    <p class="text-lg md:text-xl text-stone-600 leading-relaxed max-w-3xl mx-auto">
+        Att bygga upp ett adekvat ordförråd på ett nytt språk i vuxen ålder är en komplex process. Forskning visar att inlärarens skolbakgrund, läsvanor och förståelsen för skillnaden mellan aktivt och passivt ordförråd är direkt avgörande för förmågan att klara det svenska utbildningssystemet (SFI, Grundläggande och SVA).
+    </p>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 pb-24 space-y-24">
+
+    <section id="krav" class="scroll-mt-24">
+        <div class="bg-white rounded-2xl shadow-sm border border-stone-100 p-8 md:p-12">
+            <div class="max-w-3xl mx-auto mb-10 text-center">
+                <h2 class="text-3xl font-bold mb-4">Vilket ordförråd krävs?</h2>
+                <p class="text-stone-600">
+                    Detta avsnitt illustrerar de kvantitativa kraven för att klara olika utbildningsnivåer i Sverige. Ett "ord" definieras här utifrån forskningens begrepp <i>ordfamilj</i> (t.ex. räknas hoppa, hoppade, hoppning som en enhet). Modersmålstalare har som referens ett ordförråd på över 50 000 ord.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+                <div class="lg:col-span-2">
+                    <div class="chart-container">
+                        <canvas id="reqChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="p-5 rounded-xl bg-[#F4F7F6] border-l-4 border-[#2F6664]">
+                        <h3 class="font-bold text-lg text-[#2F6664] mb-2">SFI (Nivå A1-B1)</h3>
+                        <p class="text-sm text-stone-700">Kräver ca <strong>2 000 - 3 000</strong> basord för att klara vardagskommunikation. Dessa ord täcker upp till 80% av de ord som används i dagligt tal.</p>
+                    </div>
+                    <div class="p-5 rounded-xl bg-[#FAF5F0] border-l-4 border-[#D4A373]">
+                        <h3 class="font-bold text-lg text-[#D4A373] mb-2">Grundläggande (Nivå B1-B2)</h3>
+                        <p class="text-sm text-stone-700">Kräver ca <strong>4 000 - 5 000</strong> ord. Nödvändigt för att förstå enklare tidningstexter och delta i diskussioner utanför den omedelbara vardagen.</p>
+                    </div>
+                    <div class="p-5 rounded-xl bg-[#F2EEF4] border-l-4 border-[#6D6875]">
+                        <h3 class="font-bold text-lg text-[#6D6875] mb-2">SVA (Gymnasienivå C1)</h3>
+                        <p class="text-sm text-stone-700">Kräver ca <strong>8 000 - 10 000+</strong> ord. Avancerade facktermer, abstrakta begrepp och nyansord krävs för att tillgodogöra sig gymnasiala studier och akademiska texter.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="bakgrund" class="scroll-mt-24">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-5 space-y-6">
+                <h2 class="text-3xl font-bold">Skolbakgrundens betydelse</h2>
+                <p class="text-stone-600">
+                    Detta avsnitt undersöker hur inlärarens tidigare studiebakgrund påverkar utvecklingen av det <strong>aktiva</strong> (ord man själv kan använda) och det <strong>passiva</strong> (receptiva, ord man förstår) ordförrådet under de första årens studier. Välj bakgrund nedan för att se hur inlärningsprofilen förändras.
+                </p>
+                
+                <div class="flex flex-col space-y-3 pt-4">
+                    <button id="btn-ingen" class="tab-btn active px-6 py-4 rounded-xl border-2 border-stone-200 text-left transition-all font-semibold flex items-center justify-between group">
+                        <span>Ingen skolbakgrund (Analfabet)</span>
+                        <span class="text-xl">📚🚫</span>
+                    </button>
+                    <button id="btn-lag" class="tab-btn px-6 py-4 rounded-xl border-2 border-stone-200 text-stone-600 text-left transition-all font-semibold hover:border-[#2F6664] flex items-center justify-between">
+                        <span>Låg skolbakgrund (&lt; 9 år)</span>
+                        <span class="text-xl">🏫</span>
+                    </button>
+                    <button id="btn-hog" class="tab-btn px-6 py-4 rounded-xl border-2 border-stone-200 text-stone-600 text-left transition-all font-semibold hover:border-[#2F6664] flex items-center justify-between">
+                        <span>Hög skolbakgrund (Universitet)</span>
+                        <span class="text-xl">🎓</span>
+                    </button>
+                </div>
+
+                <div id="bakgrund-text" class="mt-8 p-6 bg-white rounded-xl shadow-sm border border-stone-100 text-sm leading-relaxed text-stone-700 transition-opacity duration-300">
+                    <strong>Karakteristik:</strong> Elever utan skolbakgrund utvecklar sitt ordförråd primärt genom muntlig interaktion. Det passiva ordförrådet växer långsamt eftersom de inte kan tillgodogöra sig skriven text. De inlärda orden är starkt knutna till den konkreta vardagen, och avståndet mellan vad de förstår och vad de kan säga är relativt litet jämfört med studievana elever.
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-stone-100 p-8">
+                <h3 id="chart-title-bakgrund" class="text-xl font-bold text-center mb-6">Ordförrådsstorlek efter ca 2 års språkvistelse/studier</h3>
+                <div class="chart-container">
+                    <canvas id="bgChart"></canvas>
+                </div>
+                <div class="mt-6 flex justify-center space-x-8 text-sm">
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-[#2F6664] mr-2"></span>
+                        <span class="text-stone-600">Aktivt (Produktivt)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-[#A5C4C2] mr-2"></span>
+                        <span class="text-stone-600">Passivt (Receptivt)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="lasning" class="scroll-mt-24">
+        <div class="bg-stone-800 rounded-3xl text-white overflow-hidden shadow-xl">
+            <div class="grid grid-cols-1 lg:grid-cols-2">
+                <div class="p-10 md:p-14 lg:p-16 flex flex-col justify-center">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6 text-[#E8F0EF]">Läsningens avgörande kraft</h2>
+                    <p class="text-stone-300 mb-6 leading-relaxed">
+                        I detta avsnitt visas varför fritidsläsning av böcker och längre texter är den enskilt viktigaste faktorn för att nå avancerad språknivå (SVA-nivå). Muntlig kommunikation i vardagen använder sällan mer än 3 000 unika ord.
+                    </p>
+                    <p class="text-stone-300 mb-8 leading-relaxed">
+                        För elever som enbart förlitar sig på talat språk avstannar ordförrådsutvecklingen ofta på en platå. De som läser regelbundet exponeras för lågfrekventa ord, abstrakta begrepp och idiomatiska uttryck, vilket skapar en exponentiell tillväxt av det passiva ordförrådet, vilket i sin tur göder det aktiva.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <span class="text-2xl mr-4 mt-1">📈</span>
+                            <div>
+                                <h4 class="font-bold text-white">Den lexikala platån</h4>
+                                <p class="text-stone-400 text-sm">Utan läsning stagnerar förrådet ofta kring B1-nivå (vardagsspråk).</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="text-2xl mr-4 mt-1">🧠</span>
+                            <div>
+                                <h4 class="font-bold text-white">Abstraktionsnivån</h4>
+                                <p class="text-stone-400 text-sm">Böcker innehåller 2-3 gånger fler sällsynta ord än tv-program eller samtal mellan vänner.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-stone-900 p-8 md:p-12 flex items-center">
+                    <div class="w-full">
+                        <h3 class="text-center font-semibold text-stone-400 mb-6 uppercase tracking-wider text-sm">Ordförrådets tillväxt över tid</h3>
+                        <div class="chart-container">
+                            <canvas id="readChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="bg-white border-t border-stone-200 py-12">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+        <p class="text-stone-500 text-sm">Denna interaktiva rapport är en syntes av vedertagen forskning inom andraspråksinlärning (t.ex. Nation, Hyltenstam, Lindell) gällande ordförrådets storlek, djup och inlärningsfaktorer hos vuxna L2-inlärare.</p>
+    </div>
+</footer>
+
+<script>
+    const dataContent = {
+        ingen: {
+            text: "<strong>Karakteristik:</strong> Elever utan skolbakgrund utvecklar sitt ordförråd primärt genom muntlig interaktion. Det passiva ordförrådet växer långsamt eftersom de inte kan tillgodogöra sig skriven text förrän de knäckt läskoden. De inlärda orden är starkt knutna till den konkreta vardagen. Avståndet mellan vad de förstår (passivt) och vad de kan uttrycka (aktivt) är smalt. Abstrakta begrepp är särskilt svåra att tillägna sig.",
+            active: 800,
+            passive: 1200
+        },
+        lag: {
+            text: "<strong>Karakteristik:</strong> Inlärare med kort studiebakgrund har grundläggande studievana och litteracitet, vilket möjliggör en snabbare start. De drar nytta av texter på lektionerna men överför sällan läsandet till fritiden utan direkt styrning. Deras passiva ordförråd växer om det aktiva, men de har ofta svårt att ta steget från grundläggande SFI-ordförråd till den mer avancerade nivå som krävs för yrkesliv eller vidare studier utan explicit undervisning i strategier.",
+            active: 1800,
+            passive: 3500
+        },
+        hog: {
+            text: "<strong>Karakteristik:</strong> Studievana elever med högskolebakgrund har starka metalingvistiska strategier. De letar medvetet efter mönster, använder lexikon effektivt och drar nytta av internationella ord (transfer från L1 eller engelska). Detta resulterar i en explosion av det passiva ordförrådet redan tidigt i inlärningen. Klyftan mellan deras enorma passiva förråd och deras mer begränsade aktiva produktion kan skapa frustration till en början.",
+            active: 3500,
+            passive: 8500
+        }
+    };
+
+    let bgChartInstance = null;
+
+    function initCharts() {
+        const reqCtx = document.getElementById('reqChart').getContext('2d');
+        new Chart(reqCtx, {
+            type: 'bar',
+            data: {
+                labels: ['SFI', 'Grundläggande', 'SVA (Gymnasial)'],
+                datasets: [{
+                    label: 'Antal ordfamiljer',
+                    data: [2500, 5000, 9000],
+                    backgroundColor: [
+                        '#2F6664', 
+                        '#D4A373', 
+                        '#6D6875'  
+                    ],
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(45, 51, 57, 0.9)',
+                        titleFont: { size: 14, family: 'Nunito Sans' },
+                        bodyFont: { size: 14, family: 'Nunito Sans' },
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.toLocaleString('sv-SE') + ' ord';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f0f0f0' },
+                        ticks: { font: { family: 'Nunito Sans' }, color: '#666' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { family: 'Nunito Sans', weight: 'bold' }, color: '#333' }
+                    }
+                }
+            }
+        });
+
+        const bgCtx = document.getElementById('bgChart').getContext('2d');
+        bgChartInstance = new Chart(bgCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Ordförråd (Uppskattat antal)'],
+                datasets: [
+                    {
+                        label: 'Aktivt ordförråd',
+                        data: [dataContent.ingen.active],
+                        backgroundColor: '#2F6664',
+                        borderRadius: 6,
+                        barPercentage: 0.4,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Passivt ordförråd',
+                        data: [dataContent.ingen.passive],
+                        backgroundColor: '#A5C4C2',
+                        borderRadius: 6,
+                        barPercentage: 0.4,
+                        categoryPercentage: 0.8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(45, 51, 57, 0.9)',
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw.toLocaleString('sv-SE');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10000, 
+                        grid: { color: '#f0f0f0' },
+                        ticks: { font: { family: 'Nunito Sans' } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { display: false } 
+                    }
+                }
+            }
+        });
+
+        const readCtx = document.getElementById('readChart').getContext('2d');
+        new Chart(readCtx, {
+            type: 'line',
+            data: {
+                labels: ['År 1', 'År 2', 'År 3', 'År 4', 'År 5'],
+                datasets: [
+                    {
+                        label: 'Läser regelbundet böcker',
+                        data: [2500, 4800, 7500, 10200, 12500],
+                        borderColor: '#D4A373',
+                        backgroundColor: 'rgba(212, 163, 115, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#D4A373',
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Läser inte böcker',
+                        data: [2000, 2800, 3200, 3400, 3500],
+                        borderColor: '#6D6875',
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        pointBackgroundColor: '#6D6875',
+                        pointRadius: 5,
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#E8F0EF',
+                            font: { family: 'Nunito Sans', size: 13 },
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#A3A3A3', font: { family: 'Nunito Sans' } }
+                    },
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#E8F0EF', font: { family: 'Nunito Sans' } }
+                    }
+                }
+            }
+        });
+    }
+
+    function setupInteractions() {
+        const btns = {
+            'ingen': document.getElementById('btn-ingen'),
+            'lag': document.getElementById('btn-lag'),
+            'hog': document.getElementById('btn-hog')
+        };
+        const textBox = document.getElementById('bakgrund-text');
+
+        Object.keys(btns).forEach(key => {
+            btns[key].addEventListener('click', function() {
+                Object.values(btns).forEach(b => {
+                    b.classList.remove('active', 'bg-[#2F6664]', 'text-white', 'border-[#2F6664]');
+                    b.classList.add('text-stone-600', 'border-stone-200');
+                });
+
+                this.classList.add('active', 'bg-[#2F6664]', 'text-white', 'border-[#2F6664]');
+                this.classList.remove('text-stone-600', 'border-stone-200');
+
+                textBox.style.opacity = 0;
+                
+                setTimeout(() => {
+                    textBox.innerHTML = dataContent[key].text;
+                    textBox.style.opacity = 1;
+                    
+                    if (bgChartInstance) {
+                        bgChartInstance.data.datasets[0].data = [dataContent[key].active];
+                        bgChartInstance.data.datasets[1].data = [dataContent[key].passive];
+                        bgChartInstance.update();
+                    }
+                }, 200);
+            });
+        });
+    }
+
+    window.onload = function() {
+        initCharts();
+        setupInteractions();
+    };
+</script>
+</body>
+</html>
