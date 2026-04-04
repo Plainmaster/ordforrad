@@ -2,15 +2,33 @@ import React, { useState } from 'react'
 import { estimateMilestones, formatDuration, dailyGain } from '../utils/calculations'
 
 const MILESTONE_STYLES = [
-  { accent: '#2CC9A0', glow: 'rgba(44,201,160,0.06)', border: 'rgba(44,201,160,0.18)' },
-  { accent: '#E0855A', glow: 'rgba(224,133,90,0.06)', border: 'rgba(224,133,90,0.18)' },
-  { accent: '#9B88D1', glow: 'rgba(155,136,209,0.06)', border: 'rgba(155,136,209,0.18)' },
+  {
+    accent: '#2CC9A0',
+    glowDark: 'rgba(44,201,160,0.06)',
+    glowLight: 'rgba(44,201,160,0.10)',
+    borderDark: 'rgba(44,201,160,0.18)',
+    borderLight: 'rgba(44,201,160,0.25)',
+  },
+  {
+    accent: '#E0855A',
+    glowDark: 'rgba(224,133,90,0.06)',
+    glowLight: 'rgba(224,133,90,0.10)',
+    borderDark: 'rgba(224,133,90,0.18)',
+    borderLight: 'rgba(224,133,90,0.25)',
+  },
+  {
+    accent: '#9B88D1',
+    glowDark: 'rgba(155,136,209,0.06)',
+    glowLight: 'rgba(155,136,209,0.10)',
+    borderDark: 'rgba(155,136,209,0.18)',
+    borderLight: 'rgba(155,136,209,0.25)',
+  },
 ]
 
 function SubcourseList({ subcourses, metrics, accent }) {
   const gain = dailyGain(metrics)
   return (
-    <div style={{ marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
+    <div style={{ marginTop: '12px', borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
       {subcourses.map((sub) => {
         const already = metrics.currentVocab >= sub.target
         const months = already ? 0 : gain <= 0 ? null : Math.ceil((sub.target - metrics.currentVocab) / (gain * 30))
@@ -23,7 +41,7 @@ function SubcourseList({ subcourses, metrics, accent }) {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '8px 0',
-              borderBottom: '1px solid rgba(255,255,255,0.04)',
+              borderBottom: '1px solid var(--border)',
             }}
           >
             <div style={{ flex: 1 }}>
@@ -32,7 +50,7 @@ function SubcourseList({ subcourses, metrics, accent }) {
                   style={{
                     fontSize: '0.8125rem',
                     fontWeight: 600,
-                    color: already ? accent : '#9AA6B4',
+                    color: already ? accent : 'var(--text-label)',
                     fontFamily: "'IBM Plex Sans', sans-serif",
                   }}
                 >
@@ -41,15 +59,14 @@ function SubcourseList({ subcourses, metrics, accent }) {
                 <span
                   style={{
                     fontSize: '0.6875rem',
-                    color: '#4E5C6A',
+                    color: 'var(--text-tertiary)',
                     fontFamily: "'IBM Plex Mono', monospace",
                   }}
                 >
                   {sub.target.toLocaleString('sv')} ord
                 </span>
               </div>
-              {/* mini progress bar */}
-              <div style={{ height: '2px', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.05)', overflow: 'hidden', width: '100%' }}>
+              <div style={{ height: '2px', borderRadius: '9999px', backgroundColor: 'var(--progress-track)', overflow: 'hidden', width: '100%' }}>
                 <div style={{ height: '100%', width: `${progress}%`, backgroundColor: accent, borderRadius: '9999px', opacity: 0.6, transition: 'width 0.4s ease' }} />
               </div>
             </div>
@@ -73,6 +90,7 @@ export default function MilestoneCards({ metrics }) {
   const estimates = estimateMilestones(metrics)
   const gain = dailyGain(metrics)
   const [open, setOpen] = useState({})
+  const isDark = document.documentElement.dataset.theme !== 'light'
 
   function toggle(id) {
     setOpen((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -83,8 +101,8 @@ export default function MilestoneCards({ metrics }) {
       <div
         className="p-6"
         style={{
-          backgroundColor: '#161C24',
-          border: '1px solid #252D38',
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--border)',
           borderRadius: '16px',
         }}
       >
@@ -92,16 +110,16 @@ export default function MilestoneCards({ metrics }) {
           style={{
             fontSize: '1.25rem',
             fontWeight: 700,
-            color: '#F0EDE8',
+            color: 'var(--text-primary)',
             fontFamily: "'Playfair Display', serif",
             marginBottom: '4px',
           }}
         >
           Tid till varje nivå
         </h2>
-        <p style={{ fontSize: '0.8125rem', color: '#6E7A88', marginBottom: '20px' }}>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '20px' }}>
           Baserat på{' '}
-          <strong style={{ color: '#ECA234', fontFamily: "'IBM Plex Mono', monospace" }}>
+          <strong style={{ color: 'var(--amber)', fontFamily: "'IBM Plex Mono', monospace" }}>
             {gain.toFixed(1)} ord/dag
           </strong>{' '}
           effektivt ordtillskott.
@@ -110,6 +128,8 @@ export default function MilestoneCards({ metrics }) {
         <div className="space-y-3">
           {estimates.map(({ milestone, months, alreadyReached }, i) => {
             const s = MILESTONE_STYLES[i]
+            const glow = isDark ? s.glowDark : s.glowLight
+            const border = isDark ? s.borderDark : s.borderLight
             const progress = Math.min(100, (metrics.currentVocab / milestone.target) * 100)
             const isOpen = open[milestone.id]
 
@@ -117,8 +137,8 @@ export default function MilestoneCards({ metrics }) {
               <div
                 key={milestone.id}
                 style={{
-                  backgroundColor: s.glow,
-                  border: `1px solid ${s.border}`,
+                  backgroundColor: glow,
+                  border: `1px solid ${border}`,
                   borderRadius: '12px',
                   padding: '16px',
                 }}
@@ -137,7 +157,7 @@ export default function MilestoneCards({ metrics }) {
                     >
                       {milestone.label}
                     </h3>
-                    <p style={{ fontSize: '0.75rem', color: '#4E5C6A' }}>{milestone.sublabel}</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{milestone.sublabel}</p>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
@@ -170,14 +190,13 @@ export default function MilestoneCards({ metrics }) {
                       </span>
                     )}
 
-                    {/* Toggle button */}
                     <button
                       onClick={() => toggle(milestone.id)}
                       style={{
                         width: '24px',
                         height: '24px',
                         borderRadius: '6px',
-                        border: `1px solid ${s.border}`,
+                        border: `1px solid ${border}`,
                         backgroundColor: isOpen ? `${s.accent}22` : 'transparent',
                         color: s.accent,
                         cursor: 'pointer',
@@ -198,15 +217,15 @@ export default function MilestoneCards({ metrics }) {
 
                 {/* Description + target */}
                 <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ fontSize: '0.75rem', color: '#6E7A88' }}>{milestone.description}</p>
-                  <span style={{ fontSize: '0.6875rem', color: '#4E5C6A', fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0, marginLeft: '8px' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{milestone.description}</p>
+                  <span style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0, marginLeft: '8px' }}>
                     {milestone.target.toLocaleString('sv')} ord
                   </span>
                 </div>
 
                 {/* Main progress bar */}
                 {!alreadyReached && (
-                  <div style={{ marginTop: '12px', height: '3px', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.04)', overflow: 'hidden' }}>
+                  <div style={{ marginTop: '12px', height: '3px', borderRadius: '9999px', backgroundColor: 'var(--progress-track)', overflow: 'hidden' }}>
                     <div
                       style={{
                         height: '100%',
@@ -220,7 +239,6 @@ export default function MilestoneCards({ metrics }) {
                   </div>
                 )}
 
-                {/* Expanded sub-courses */}
                 {isOpen && milestone.subcourses && (
                   <SubcourseList subcourses={milestone.subcourses} metrics={metrics} accent={s.accent} />
                 )}
