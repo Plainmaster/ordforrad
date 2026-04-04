@@ -9,29 +9,29 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from 'recharts'
-import { generateProgressSeries, MILESTONES } from '../utils/calculations'
+import { generateProgressSeries, MILESTONES, xAxisTickFormatter } from '../utils/calculations'
 
 const MILESTONE_COLORS = ['#2CC9A0', '#E0855A', '#9B88D1']
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload?.length) return null
   const words = payload[0]?.value
   return (
     <div
       style={{
-        backgroundColor: '#1E2632',
-        border: '1px solid #2E3947',
+        backgroundColor: isDark ? '#1E2632' : '#FFFFFF',
+        border: `1px solid ${isDark ? '#2E3947' : '#E0D9CF'}`,
         borderRadius: '8px',
         padding: '10px 14px',
         fontSize: '0.8125rem',
         fontFamily: "'IBM Plex Sans', sans-serif",
       }}
     >
-      <p style={{ fontWeight: 500, marginBottom: '4px', color: '#9AA6B4' }}>{label}</p>
+      <p style={{ fontWeight: 500, marginBottom: '4px', color: isDark ? '#C4CDD6' : '#5A4E44' }}>{label}</p>
       <p
         style={{
           fontFamily: "'IBM Plex Mono', monospace",
-          color: '#ECA234',
+          color: isDark ? '#ECA234' : '#C8841A',
           fontWeight: 600,
         }}
       >
@@ -41,27 +41,37 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
-function tickFormatter(value) {
+function yTickFormatter(value) {
   if (value >= 1000) return `${(value / 1000).toFixed(1)}k`
   return value
 }
 
-export default function ProgressChart({ metrics }) {
+export default function ProgressChart({ metrics, isDark }) {
   const series = useMemo(() => generateProgressSeries(metrics), [metrics])
 
-  const formattedSeries = series
+  const chartTicks = useMemo(() => {
+    const maxMonth = series.length > 0 ? series[series.length - 1].month : 24
+    const ticks = []
+    for (let m = 0; m <= maxMonth; m += 6) ticks.push(m)
+    return ticks
+  }, [series])
 
   const maxWords = Math.max(
     ...series.map((d) => d.words),
     MILESTONES[MILESTONES.length - 1].target + 500
   )
 
+  const gridColor = isDark ? '#1C2430' : '#EDE6DC'
+  const axisTickColor = isDark ? '#7A8896' : '#8C7B6A'
+  const axisLineColor = isDark ? '#252D38' : '#E0D9CF'
+  const amberColor = isDark ? '#ECA234' : '#C8841A'
+
   return (
     <div
       className="p-6"
       style={{
-        backgroundColor: '#161C24',
-        border: '1px solid #252D38',
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '16px',
       }}
     >
@@ -69,44 +79,37 @@ export default function ProgressChart({ metrics }) {
         style={{
           fontSize: '1.25rem',
           fontWeight: 700,
-          color: '#F0EDE8',
+          color: 'var(--text-primary)',
           fontFamily: "'Playfair Display', serif",
           marginBottom: '4px',
         }}
       >
         Framstegsprognos
       </h2>
-      <p style={{ fontSize: '0.8125rem', color: '#6E7A88', marginBottom: '24px' }}>
+      <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '24px' }}>
         Projektion av ditt ordförråd över tid med aktuella inställningar.
       </p>
 
       <ResponsiveContainer width="100%" height={340}>
-        <LineChart data={formattedSeries} margin={{ top: 10, right: 150, left: 0, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1C2430" />
+        <LineChart data={series} margin={{ top: 10, right: 150, left: 0, bottom: 10 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
           <XAxis
             dataKey="month"
-            tick={{ fontSize: 11, fill: '#4E5C6A', fontFamily: "'IBM Plex Mono', monospace" }}
-            interval="preserveStartEnd"
-            axisLine={{ stroke: '#252D38' }}
+            ticks={chartTicks}
+            tickFormatter={xAxisTickFormatter}
+            tick={{ fontSize: 11, fill: axisTickColor, fontFamily: "'IBM Plex Mono', monospace" }}
+            axisLine={{ stroke: axisLineColor }}
             tickLine={false}
-            label={{
-              value: 'månader',
-              position: 'insideBottom',
-              offset: -12,
-              fontSize: 10,
-              fill: '#4E5C6A',
-              fontFamily: "'IBM Plex Mono', monospace",
-            }}
           />
           <YAxis
-            tickFormatter={tickFormatter}
-            tick={{ fontSize: 11, fill: '#4E5C6A', fontFamily: "'IBM Plex Mono', monospace" }}
+            tickFormatter={yTickFormatter}
+            tick={{ fontSize: 11, fill: axisTickColor, fontFamily: "'IBM Plex Mono', monospace" }}
             domain={[0, Math.ceil(maxWords / 1000) * 1000]}
             width={40}
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip isDark={isDark} />} />
 
           {MILESTONES.map((m, i) => (
             <ReferenceLine
@@ -130,10 +133,10 @@ export default function ProgressChart({ metrics }) {
           <Line
             type="monotone"
             dataKey="words"
-            stroke="#ECA234"
+            stroke={amberColor}
             strokeWidth={2.5}
             dot={false}
-            activeDot={{ r: 5, fill: '#ECA234', stroke: '#0D1117', strokeWidth: 2 }}
+            activeDot={{ r: 5, fill: amberColor, stroke: isDark ? '#0D1117' : '#F9F6F1', strokeWidth: 2 }}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -148,7 +151,7 @@ export default function ProgressChart({ metrics }) {
               alignItems: 'center',
               gap: '6px',
               fontSize: '0.75rem',
-              color: '#6E7A88',
+              color: 'var(--text-secondary)',
               fontFamily: "'IBM Plex Mono', monospace",
             }}
           >

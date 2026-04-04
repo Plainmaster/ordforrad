@@ -183,7 +183,8 @@ export function estimateMilestones(metrics) {
 }
 
 /**
- * Formats a month count as a human-readable string in Swedish.
+ * Formats a month count as a human-readable Swedish string.
+ * Uses compact "X år Y mån" format for durations ≥ 12 months.
  */
 export function formatDuration(months) {
   if (months === 0) return 'Redan nådd'
@@ -193,5 +194,21 @@ export function formatDuration(months) {
   const years = Math.floor(months / 12)
   const rem = months % 12
   if (rem === 0) return `${years} år`
-  return `${years} år och ${rem} månad${rem === 1 ? '' : 'er'}`
+  return `${years} år ${rem} mån`
+}
+
+/**
+ * Formats a month number for the progress chart X-axis.
+ * Only shows labels at month 0, every 6 months, and every 12 months.
+ * All other months return '' so only tick marks show.
+ */
+export function xAxisTickFormatter(monthNum) {
+  if (monthNum === 0) return 'Nu'
+  if (monthNum % 12 === 0) return `År ${monthNum / 12}`
+  if (monthNum % 6 === 0) {
+    const y = Math.floor(monthNum / 12)
+    const mo = monthNum % 12
+    return y > 0 ? `${y}å ${mo}m` : `${mo} mån`
+  }
+  return ''
 }
