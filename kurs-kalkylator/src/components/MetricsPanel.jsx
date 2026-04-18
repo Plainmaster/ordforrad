@@ -26,7 +26,7 @@ function Slider({ id, label, min, max, step, value, onChange, formatValue, hint 
           style={{
             fontSize: '0.8125rem',
             fontWeight: 500,
-            color: '#9AA6B4',
+            color: 'var(--text-label)',
             fontFamily: "'IBM Plex Sans', sans-serif",
           }}
         >
@@ -36,7 +36,7 @@ function Slider({ id, label, min, max, step, value, onChange, formatValue, hint 
           style={{
             fontSize: '0.875rem',
             fontWeight: 600,
-            color: '#ECA234',
+            color: 'var(--amber)',
             fontFamily: "'IBM Plex Mono', monospace",
           }}
         >
@@ -55,7 +55,7 @@ function Slider({ id, label, min, max, step, value, onChange, formatValue, hint 
         style={{ '--pct': `${pct}%` }}
       />
       {hint && (
-        <p style={{ fontSize: '0.75rem', color: '#4E5C6A' }}>{hint}</p>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{hint}</p>
       )}
     </div>
   )
@@ -79,7 +79,7 @@ function GrammarScale({ value, onChange }) {
           style={{
             fontSize: '0.8125rem',
             fontWeight: 500,
-            color: '#9AA6B4',
+            color: 'var(--text-label)',
             fontFamily: "'IBM Plex Sans', sans-serif",
           }}
         >
@@ -89,7 +89,7 @@ function GrammarScale({ value, onChange }) {
           style={{
             fontSize: '0.875rem',
             fontWeight: 600,
-            color: '#ECA234',
+            color: 'var(--amber)',
             fontFamily: "'IBM Plex Mono', monospace",
           }}
         >
@@ -106,7 +106,7 @@ function GrammarScale({ value, onChange }) {
         className="w-full"
         style={{ '--pct': `${pct}%` }}
       />
-      <p style={{ fontSize: '0.75rem', color: '#6E7A88', fontStyle: 'italic' }}>{descriptor}</p>
+      <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>{descriptor}</p>
     </div>
   )
 }
@@ -122,8 +122,8 @@ export default function MetricsPanel({ metrics, onChange }) {
     <div
       className="p-6 space-y-7"
       style={{
-        backgroundColor: '#161C24',
-        border: '1px solid #252D38',
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '16px',
       }}
     >
@@ -132,14 +132,14 @@ export default function MetricsPanel({ metrics, onChange }) {
           style={{
             fontSize: '1.25rem',
             fontWeight: 700,
-            color: '#F0EDE8',
+            color: 'var(--text-primary)',
             fontFamily: "'Playfair Display', serif",
             marginBottom: '4px',
           }}
         >
           Dina förutsättningar
         </h2>
-        <p style={{ fontSize: '0.8125rem', color: '#6E7A88' }}>
+        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
           Justera inställningarna för att se hur lång tid det tar att nå varje kursnivå.
         </p>
       </div>
@@ -150,7 +150,7 @@ export default function MetricsPanel({ metrics, onChange }) {
           style={{
             fontSize: '0.8125rem',
             fontWeight: 500,
-            color: '#9AA6B4',
+            color: 'var(--text-label)',
             fontFamily: "'IBM Plex Sans', sans-serif",
             display: 'block',
           }}
@@ -163,12 +163,12 @@ export default function MetricsPanel({ metrics, onChange }) {
           style={{
             width: '100%',
             borderRadius: '8px',
-            border: '1px solid #2E3947',
-            backgroundColor: '#0D1117',
+            border: '1px solid var(--border-input)',
+            backgroundColor: 'var(--bg-input)',
             padding: '10px 14px',
             fontSize: '0.875rem',
             fontFamily: "'IBM Plex Sans', sans-serif",
-            color: '#EDE9E3',
+            color: 'var(--text-body)',
             cursor: 'pointer',
             outline: 'none',
           }}
@@ -179,10 +179,10 @@ export default function MetricsPanel({ metrics, onChange }) {
             </option>
           ))}
         </select>
-        <p style={{ fontSize: '0.75rem', color: '#4E5C6A' }}>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
           Kända ordfamiljer:{' '}
           <strong
-            style={{ color: '#ECA234', fontFamily: "'IBM Plex Mono', monospace" }}
+            style={{ color: 'var(--amber)', fontFamily: "'IBM Plex Mono', monospace" }}
           >
             {currentVocab.toLocaleString('sv')}
           </strong>
@@ -201,22 +201,21 @@ export default function MetricsPanel({ metrics, onChange }) {
         hint="Via flashcards, glosor eller övningar"
       />
 
-      {/* Warning: high daily quota creates unsustainable review debt */}
       {wordsPerDay > 20 && (
         <div
           style={{
-            backgroundColor: 'rgba(236,162,52,0.10)',
-            border: '1px solid rgba(236,162,52,0.35)',
+            backgroundColor: 'var(--amber-bg-warn)',
+            border: '1px solid var(--amber-border-warn)',
             borderRadius: '8px',
             padding: '12px 14px',
             fontSize: '0.75rem',
             lineHeight: 1.6,
-            color: '#C8A06A',
+            color: 'var(--amber-text-warn)',
           }}
         >
           <strong
             style={{
-              color: '#ECA234',
+              color: 'var(--amber)',
               fontFamily: "'IBM Plex Mono', monospace",
               fontSize: '0.6875rem',
               letterSpacing: '0.08em',
@@ -256,7 +255,7 @@ export default function MetricsPanel({ metrics, onChange }) {
           style={{
             fontSize: '0.8125rem',
             fontWeight: 500,
-            color: '#9AA6B4',
+            color: 'var(--text-label)',
             fontFamily: "'IBM Plex Sans', sans-serif",
             display: 'block',
           }}
@@ -272,9 +271,9 @@ export default function MetricsPanel({ metrics, onChange }) {
                 width: '100%',
                 padding: '10px 14px',
                 borderRadius: '8px',
-                border: `1px solid ${background === key ? 'rgba(236,162,52,0.4)' : '#252D38'}`,
-                backgroundColor: background === key ? 'rgba(236,162,52,0.08)' : 'transparent',
-                color: background === key ? '#ECA234' : '#9AA6B4',
+                border: `1px solid ${background === key ? 'var(--amber-border-active)' : 'var(--border)'}`,
+                backgroundColor: background === key ? 'var(--amber-bg)' : 'transparent',
+                color: background === key ? 'var(--amber)' : 'var(--text-label)',
                 cursor: 'pointer',
                 textAlign: 'left',
                 fontFamily: "'IBM Plex Sans', sans-serif",
@@ -291,7 +290,7 @@ export default function MetricsPanel({ metrics, onChange }) {
                 style={{
                   fontSize: '0.6875rem',
                   fontWeight: 400,
-                  color: background === key ? '#ECA234' : '#4E5C6A',
+                  color: background === key ? 'var(--amber)' : 'var(--text-tertiary)',
                   fontFamily: "'IBM Plex Mono', monospace",
                 }}
               >
@@ -300,19 +299,19 @@ export default function MetricsPanel({ metrics, onChange }) {
             </button>
           ))}
         </div>
-        <p style={{ fontSize: '0.75rem', color: '#4E5C6A' }}>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
           Skolbakgrund påverkar framför allt incidentell inlärning via exponering.
         </p>
         {background === 'ingen' && (
           <div
             style={{
-              backgroundColor: 'rgba(110,120,136,0.08)',
-              border: '1px solid rgba(110,120,136,0.2)',
+              backgroundColor: 'var(--bg-subtle)',
+              border: '1px solid var(--border)',
               borderRadius: '8px',
               padding: '12px 14px',
               fontSize: '0.75rem',
               lineHeight: 1.6,
-              color: '#7A8694',
+              color: 'var(--text-secondary)',
             }}
           >
             Prognosen är optimistisk för den här gruppen. Inlärare utan formell skolgång
@@ -326,18 +325,18 @@ export default function MetricsPanel({ metrics, onChange }) {
       {/* Info box */}
       <div
         style={{
-          backgroundColor: 'rgba(236,162,52,0.06)',
-          border: '1px solid rgba(236,162,52,0.15)',
+          backgroundColor: 'var(--amber-bg)',
+          border: '1px solid var(--amber-border)',
           borderRadius: '8px',
           padding: '14px',
           fontSize: '0.75rem',
           lineHeight: 1.6,
-          color: '#8A96A6',
+          color: 'var(--text-secondary)',
         }}
       >
         <strong
           style={{
-            color: '#ECA234',
+            color: 'var(--amber)',
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: '0.6875rem',
             letterSpacing: '0.08em',

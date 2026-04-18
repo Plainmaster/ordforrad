@@ -2,23 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* ── Dark theme (default) ─────────────────────────── */
+:root,
+:root[data-theme='dark'] {
+  --bg: #0D1117;
+  --bg-card: #161C24;
+  --bg-input: #0D1117;
+  --bg-tooltip: #1E2632;
+  --bg-subtle: rgba(255, 255, 255, 0.03);
+  --border: #252D38;
+  --border-input: #2E3947;
+  --border-tooltip: #2E3947;
+  --text-primary: #F0EDE8;
+  --text-body: #EDE9E3;
+  --text-secondary: #8A96A6;
+  --text-tertiary: #7A8896;
+  --text-label: #C4CDD6;
   --amber: #ECA234;
+  --amber-bg: rgba(236, 162, 52, 0.08);
+  --amber-bg-warn: rgba(236, 162, 52, 0.10);
+  --amber-border: rgba(236, 162, 52, 0.2);
+  --amber-border-warn: rgba(236, 162, 52, 0.35);
+  --amber-border-active: rgba(236, 162, 52, 0.4);
+  --amber-text-warn: #C8A06A;
+  --nav-bg: rgba(13, 17, 23, 0.92);
   --track-bg: #252D38;
-  --thumb-size: 18px;
+  --progress-track: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Light theme (warm beige) ─────────────────────── */
+:root[data-theme='light'] {
+  --bg: #F9F6F1;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --bg-tooltip: #FFFFFF;
+  --bg-subtle: rgba(0, 0, 0, 0.02);
+  --border: #E0D9CF;
+  --border-input: #D0C8BF;
+  --border-tooltip: #E0D9CF;
+  --text-primary: #2A1F12;
+  --text-body: #3D3028;
+  --text-secondary: #7A6E62;
+  --text-tertiary: #8C7B6A;
+  --text-label: #5A4E44;
+  --amber: #C8841A;
+  --amber-bg: rgba(200, 132, 26, 0.08);
+  --amber-bg-warn: rgba(200, 132, 26, 0.10);
+  --amber-border: rgba(200, 132, 26, 0.2);
+  --amber-border-warn: rgba(200, 132, 26, 0.35);
+  --amber-border-active: rgba(200, 132, 26, 0.4);
+  --amber-text-warn: #7A4E10;
+  --nav-bg: rgba(249, 246, 241, 0.95);
+  --track-bg: #E0D9CF;
+  --progress-track: rgba(0, 0, 0, 0.1);
 }
 
 body {
   font-family: 'IBM Plex Sans', sans-serif;
-  background-color: #0D1117;
-  color: #EDE9E3;
+  background-color: var(--bg);
+  color: var(--text-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1, h2, h3, h4 {
   font-family: 'Playfair Display', serif;
 }
 
-/* Dark slider with filled amber track */
+/* Range slider — uses CSS vars so it works in both themes */
 input[type='range'] {
   -webkit-appearance: none;
   appearance: none;
@@ -38,12 +88,12 @@ input[type='range'] {
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: var(--thumb-size);
-  height: var(--thumb-size);
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: #ECA234;
+  background: var(--amber);
   cursor: pointer;
-  border: 2px solid #0D1117;
+  border: 2px solid var(--bg);
   box-shadow: 0 0 10px rgba(236, 162, 52, 0.5);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -54,28 +104,16 @@ input[type='range']::-webkit-slider-thumb:hover {
 }
 
 input[type='range']::-moz-range-thumb {
-  width: var(--thumb-size);
-  height: var(--thumb-size);
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: #ECA234;
+  background: var(--amber);
   cursor: pointer;
-  border: 2px solid #0D1117;
+  border: 2px solid var(--bg);
   box-shadow: 0 0 10px rgba(236, 162, 52, 0.5);
 }
 
 select option {
-  background-color: #161C24;
-  color: #EDE9E3;
-}
-
-.nav-link {
-  color: #6E7A88;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.nav-link:hover {
-  color: #ECA234;
+  background-color: var(--bg-card);
+  color: var(--text-body);
 }

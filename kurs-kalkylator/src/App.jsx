@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import MetricsPanel from './components/MetricsPanel'
 import ProgressChart from './components/ProgressChart'
 import MilestoneCards from './components/MilestoneCards'
@@ -15,15 +15,29 @@ const DEFAULT_METRICS = {
 export default function App() {
   const [metrics, setMetrics] = useState(DEFAULT_METRICS)
   const [view, setView] = useState('kalkylator')
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('theme') ?? 'dark'
+  )
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  const isDark = theme === 'dark'
+
+  function toggleTheme() {
+    setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+  }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0D1117', color: '#EDE9E3' }}>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)', color: 'var(--text-body)' }}>
       {/* Nav */}
       <nav
         className="sticky top-0 z-50 border-b"
         style={{
-          backgroundColor: 'rgba(13,17,23,0.92)',
-          borderColor: '#252D38',
+          backgroundColor: 'var(--nav-bg)',
+          borderColor: 'var(--border)',
           backdropFilter: 'blur(12px)',
         }}
       >
@@ -36,7 +50,7 @@ export default function App() {
               fontSize: '0.8125rem',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
-              color: '#ECA234',
+              color: 'var(--amber)',
               flexShrink: 0,
             }}
           >
@@ -61,8 +75,8 @@ export default function App() {
                   fontWeight: 500,
                   fontSize: '0.875rem',
                   transition: 'all 0.15s ease',
-                  backgroundColor: view === key ? 'rgba(236,162,52,0.12)' : 'transparent',
-                  color: view === key ? '#ECA234' : '#6E7A88',
+                  backgroundColor: view === key ? 'var(--amber-bg)' : 'transparent',
+                  color: view === key ? 'var(--amber)' : 'var(--text-secondary)',
                 }}
               >
                 {label}
@@ -70,8 +84,25 @@ export default function App() {
             ))}
           </div>
 
-          {/* Spacer to balance logo */}
-          <div style={{ width: '100px', flexShrink: 0 }} />
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            title={isDark ? 'Byt till ljust läge' : 'Byt till mörkt läge'}
+            style={{
+              padding: '5px 10px',
+              borderRadius: '6px',
+              border: '1px solid var(--border)',
+              backgroundColor: 'transparent',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: '0.8125rem',
+              transition: 'all 0.15s ease',
+              flexShrink: 0,
+            }}
+          >
+            {isDark ? '☀' : '◑'}
+          </button>
         </div>
       </nav>
 
@@ -89,9 +120,9 @@ export default function App() {
                 fontWeight: 600,
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                color: '#ECA234',
-                backgroundColor: 'rgba(236,162,52,0.08)',
-                border: '1px solid rgba(236,162,52,0.2)',
+                color: 'var(--amber)',
+                backgroundColor: 'var(--amber-bg)',
+                border: '1px solid var(--amber-border)',
                 borderRadius: '3px',
               }}
             >
@@ -102,7 +133,7 @@ export default function App() {
                 fontFamily: "'Playfair Display', serif",
                 fontSize: 'clamp(2.5rem, 6vw, 4rem)',
                 fontWeight: 900,
-                color: '#F0EDE8',
+                color: 'var(--text-primary)',
                 letterSpacing: '-0.02em',
                 lineHeight: 1.1,
                 marginBottom: '20px',
@@ -115,7 +146,7 @@ export default function App() {
               style={{
                 fontSize: '1.0625rem',
                 lineHeight: 1.7,
-                color: '#8A96A6',
+                color: 'var(--text-secondary)',
                 fontFamily: "'IBM Plex Sans', sans-serif",
                 fontWeight: 300,
               }}
@@ -128,29 +159,30 @@ export default function App() {
           </header>
 
           <main className="max-w-6xl mx-auto px-4 pb-24 space-y-6">
-            <ProgressChart metrics={metrics} />
+            <ProgressChart metrics={metrics} isDark={isDark} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <MetricsPanel metrics={metrics} onChange={setMetrics} />
               <MilestoneCards metrics={metrics} />
             </div>
 
+            {/* Stabilisering info box */}
             <div
               className="p-6 text-sm leading-relaxed"
               style={{
-                backgroundColor: '#161C24',
-                border: '1px solid #252D38',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border)',
                 borderRadius: '12px',
-                color: '#6E7A88',
+                color: 'var(--text-secondary)',
                 fontFamily: "'IBM Plex Sans', sans-serif",
               }}
             >
-              <strong style={{ color: '#EDE9E3' }}>Om beräkningarna</strong> – Ordförrådsmålen
-              baseras på forskning om andraspråksinlärning hos vuxna immigranter i Sverige: SFI
-              kräver ca 2 500 ordfamiljer, Grundläggande svenska ca 5 000, och SVA på gymnasienivå
-              ca 9 000. Det effektiva dagliga ordtillskottet beräknas som{' '}
-              <em>(aktiva ord + studietidsbonus) × inlärningsfaktor</em>, där grammatik- och
-              läsvanor kan öka takten med upp till 50%.{' '}
+              <strong style={{ color: 'var(--text-primary)' }}>Om språklig stabilisering</strong>
+              {' '}— Utan kontinuerlig exponering för utmanande texter kan ordförrådsutvecklingen{' '}
+              <em style={{ color: 'var(--amber)' }}>stabiliseras</em> — plana ut — runt B1-nivå (~3 500 ord).
+              Det äldre begreppet <em>fossilisering</em> (Selinker 1972) antydde en permanent stopp, men
+              modern forskning visar att platån är reversibel. Grammatikstudier och regelbunden läsning
+              (se inställningarna ovan) är de viktigaste faktorerna för att bryta igenom.{' '}
               <button
                 onClick={() => setView('forskning')}
                 style={{
@@ -158,7 +190,41 @@ export default function App() {
                   border: 'none',
                   padding: 0,
                   cursor: 'pointer',
-                  color: '#ECA234',
+                  color: 'var(--amber)',
+                  fontWeight: 500,
+                  fontFamily: 'inherit',
+                  fontSize: 'inherit',
+                }}
+              >
+                Läs mer →
+              </button>
+            </div>
+
+            {/* Om beräkningarna */}
+            <div
+              className="p-6 text-sm leading-relaxed"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                color: 'var(--text-secondary)',
+                fontFamily: "'IBM Plex Sans', sans-serif",
+              }}
+            >
+              <strong style={{ color: 'var(--text-primary)' }}>Om beräkningarna</strong>
+              {' '}– Ordförrådsmålen baseras på forskning om andraspråksinlärning hos vuxna immigranter i
+              Sverige: SFI kräver ca 2 500 ordfamiljer, Grundläggande svenska ca 5 000, och SVA på
+              gymnasienivå ca 9 000. Det effektiva dagliga ordtillskottet beräknas som{' '}
+              <em>(aktiva ord + studietidsbonus) × inlärningsfaktor</em>, där grammatik- och läsvanor
+              kan öka takten med upp till 50%.{' '}
+              <button
+                onClick={() => setView('forskning')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  color: 'var(--amber)',
                   fontWeight: 500,
                   fontFamily: 'inherit',
                   fontSize: 'inherit',
@@ -172,7 +238,7 @@ export default function App() {
       )}
 
       {/* Research view */}
-      {view === 'forskning' && <ResearchPage />}
+      {view === 'forskning' && <ResearchPage isDark={isDark} />}
     </div>
   )
 }
